@@ -14,6 +14,13 @@ module.exports = function (/* ctx */) {
   return {
     // https://v1.quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
+    proxy: {
+      '/': {
+        target: 'https://4qkcdwqf-3000.asse.devtunnels.ms/',
+        changeOrigin: true,
+        pathRewrite: { '^/': '' }
+      }
+    },
 
     // https://v1.quasar.dev/quasar-cli/prefetch-feature
     // preFetch: true,
@@ -25,11 +32,13 @@ module.exports = function (/* ctx */) {
       
       'axios',
     ],
+    
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: [
-      'app.scss'
+      'app.scss',
     ],
+   
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -47,7 +56,10 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
+      env: {
+        VUE_APP_API_URL: 'https://4qkcdwqf-3000.asse.devtunnels.ms'
+      },
 
       // transpile: false,
 
@@ -190,6 +202,15 @@ module.exports = function (/* ctx */) {
       nodeIntegration: true,
 
       extendWebpack (/* cfg */) {
+        module.exports = function (ctx) {
+          return {
+            build: {
+              vueRouterMode: 'history',
+            },
+            css: ['app.styl'],
+          }
+        }
+
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
       }
