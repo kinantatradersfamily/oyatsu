@@ -16,7 +16,7 @@ module.exports = function (/* ctx */) {
     supportTS: false,
     proxy: {
       '/': {
-        target: 'https://4qkcdwqf-3000.asse.devtunnels.ms/',
+        target: 'https://backoffice-oyatsu-production.up.railway.app/',
         changeOrigin: true,
         pathRewrite: { '^/': '' }
       }
@@ -59,7 +59,7 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'hash',
       publicPath: '',
       env: {
-        VUE_APP_API_URL: 'https://4qkcdwqf-3000.asse.devtunnels.ms'
+        VUE_APP_API_URL: 'https://backoffice-oyatsu-production.up.railway.app/'
       },
 
       // transpile: false,
