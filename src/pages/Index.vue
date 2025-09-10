@@ -61,7 +61,7 @@
           <div class="col-md-6" v-for="(value, key) of list.section_2" :key="key">
             <div class="box ">
               <div class="img-box">
-                <img :src="value.image" alt="">
+                <img :src="`${url}` + value.image" alt="">
               </div>
               <div class="detail-box">
                 <h5>
