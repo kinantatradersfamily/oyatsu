@@ -10,13 +10,31 @@
       <q-drawer v-model="drawer" show-if-above :width="200" :height="1000" :breakpoint="400">
         <q-scroll-area style="height: 100vh; margin-top: 150px; border-right: 1px solid #ddd">
           <q-list padding style="padding: 0px 10px;">
-            <q-expansion-item icon="folder" label="2025" expand-separator>
-              <q-item v-ripple v-for="(item, index) in bulan" :key="index">
+            <q-expansion-item icon="folder" :label="`Kontent`" expand-separator>
+              <q-item v-ripple>
+                <q-list padding style="padding: 0px 10px;">
+                  <q-expansion-item icon="folder" :label="`${year}`" expand-separator>
+                    <q-item v-ripple v-for="(item, index) in bulan" :key="index">
+                      <q-item-section avatar>
+                        <q-icon name="folder" />
+                      </q-item-section>
+                      <q-item-section @click="openTable(index)">
+                        {{ item }}
+                      </q-item-section>
+                    </q-item>
+                  </q-expansion-item>
+                </q-list>
+              </q-item>
+            </q-expansion-item>
+          </q-list>
+          <q-list padding style="padding: 0px 10px;">
+            <q-expansion-item icon="folder" :label="`Order`" expand-separator>
+              <q-item v-ripple>
                 <q-item-section avatar>
                   <q-icon name="folder" />
                 </q-item-section>
-                <q-item-section @click="openTable(index)">
-                  {{ item }}
+                <q-item-section>
+                 Customer
                 </q-item-section>
               </q-item>
             </q-expansion-item>
@@ -60,7 +78,8 @@
             </template>
             <template v-slot:body-cell-action="props">
               <q-td :props="props">
-                <button class="btn btn-success" @click="editRow(props.row, key)">Edit</button>
+                <button class="btn btn-success" @click="editRow(props.row, key)" v-if="month >= currentMonth.getMonth()">Edit</button>
+                <span v-else>-</span>
               </q-td>
             </template>
           </q-table>
@@ -101,6 +120,7 @@
                 <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
               </div>
             </div>
+           
             <hr>
           </div>
         </div>
@@ -169,6 +189,7 @@ export default {
       Object.keys(this.section).forEach(key => {
         this.section[key] = false;
       });
+
       const datax = {
         1: 'satu',
         2: 'dua',
@@ -234,7 +255,7 @@ export default {
           title: item.title || null,
           desc: item.desc || null,
           price: item.price || null,
-          image: item.image ? null : null // nanti BE isi path
+          image: item.image ? null : null
         }));
         
 
@@ -276,10 +297,12 @@ export default {
     async getEvents() {
       try {
         const res = await axios.get(`${this.url}/component/${this.year}`)
-        console.log(this.url)
         this.list = res.data.message;
       } catch (err) {
-        console.error(err, 'xxx')
+        this.$q.notify({
+          type: 'negative',
+          message: `Failed to Update because ${err}`
+        })
       }
     }
   },

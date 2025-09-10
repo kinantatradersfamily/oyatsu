@@ -18,10 +18,6 @@ require('../assets/js/jquery-3.4.1.min.js')
 require('../assets/js/bootstrap.js')
 require('../assets/js/custom.js')
 
-require('../assets/adminlte/js/adminlte.js')
-require('../assets/adminlte/css/adminlte.css')
-require("../assets/adminlte/js/custom.adminlte.js")
-require("../assets/adminlte/css/AdminLTE.min.css")
 import "../assets/adminlte/css/skins/_all-skins.min.css";
 
 
