@@ -50,7 +50,6 @@
                                         </template>
                                         <template v-slot:body-cell-price="props">
                                             <q-td :props="props">
-                                                {{ }}
                                                 {{ formatRupiah(props.value) ? formatRupiah(parseInt(props.value)) : '-' }}
                                             </q-td>
                                         </template>
@@ -213,14 +212,15 @@ export default {
 
                 return item
             })
-            this.flavorObj = JSON.parse(JSON.stringify(this.flavorObj))
-            this.listOfFlavor.forEach(item => {
-                item['price'] = 70000 * parseInt(item.pack)
-            })
+          
 
             if (condition) return
 
             this.listOfFlavor.push(this.flavorObj)
+            this.listOfFlavor = this.listOfFlavor.map(item => {
+                item['price'] = 70000 * parseInt(item.pack)
+                return item
+            })
              this.flavorObj = {
                 flavor: '',
                 pack: 0
@@ -231,8 +231,6 @@ export default {
                 { name: 'price', align: 'center', label: 'Price', field: 'price', sortable: true },
             ]
             this.columns = columnsTable
-
-           
         }
     },
     mounted() {
