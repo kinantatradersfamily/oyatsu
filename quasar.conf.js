@@ -57,6 +57,7 @@ module.exports = function (/* ctx */) {
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
+      publicPath: './',
       env: {
         VUE_APP_API_URL: 'https://4qkcdwqf-3000.asse.devtunnels.ms'
       },
