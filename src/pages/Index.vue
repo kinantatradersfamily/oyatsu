@@ -1245,9 +1245,7 @@ export default {
   },
   methods: {
     async getEvents () {
-      console.log(this.url)
       try {
-        console.log('dw')
         const res = await axios.get(`${this.url}/component/${this.year}`);
         const date = new Date()
         const month = date.getMonth()
@@ -1259,7 +1257,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.url)
     this.getEvents()
   }
 }

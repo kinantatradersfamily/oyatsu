@@ -22,7 +22,7 @@
                                 </div>
                                 <div>
                                     <label for="form-control">Flavor :</label>
-                                    <select class="form-control nice-select wide select-flavor"
+                                    <select class="form-control nice-select wide select-flavor" id="flavor-select"
                                         style="margin-bottom: 0px !important;" v-model="flavorObj.flavor">
                                         <option :value="data" v-for="(data, index) of listFlavor" :key="index">
                                             {{ data }}
@@ -86,9 +86,9 @@
                                     </div>
                                 </div>
                                 <div class="btn_box">
-                                    <div @click="orderItem" style="border-radius: 5px !important;">
+                                    <a href="javascript:void(0)" class="btn btn-warning" @click="orderItem" style="color:white;margin-top:5px;border-radius: 5px !important;">
                                         Order Now
-                                    </div>
+                                    </a>
                                 </div>
                             </form>
                         </div>
@@ -151,14 +151,6 @@ export default {
             this.forPayload.document = e.target.files[0];
         },
         async orderItem() {
-            const sections = Object.values(this.forPayload)
-                .filter(item => item.email || item.phone || item.flavor || item.document)
-                .map(item => ({
-                    email: item.email || null,
-                    phone: item.phone || null,
-                    flavor: item.flavor || null,
-                    image: item.document ? null : null
-            }));
             this.forPayload['flavor'] = this.listOfFlavor
             const formData = new FormData();
 
@@ -199,8 +191,8 @@ export default {
                 })
                 return
             }
-            let condition = false
 
+            let condition = false
             if(this.listOfFlavor && this.listOfFlavor.length > 0) {
                 condition = this.listOfFlavor.some(item => item.flavor == this.flavorObj.flavor)
             }
@@ -215,6 +207,8 @@ export default {
           
 
             if (condition) return
+
+            if(!this.flavorObj.flavor) this.flavorObj.flavor = $('#flavor-select').val()
 
             this.listOfFlavor.push(this.flavorObj)
             this.listOfFlavor = this.listOfFlavor.map(item => {
@@ -236,7 +230,7 @@ export default {
     mounted() {
         const date = new Date()
         this.year = date.getFullYear()
-        this.month = date.getFullYear()
+        this.month = date.getMonth()
     }
 }
 

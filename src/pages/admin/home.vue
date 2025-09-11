@@ -196,13 +196,26 @@ export default {
         3: 'tiga',
         4: 'empat'
       };
+
       this.sectionValue[datax[numb]] = JSON.parse(JSON.stringify(obj))
       this.editValue = this.sectionValue[datax[numb]]
+      this.editValue['section'] = value
       this.section[datax[numb]] = true;
     },
     async editSubmit() {
       try{
-        const result = await axios.put(`${this.url}/component/${this.editValue.id}`, this.editValue);
+      const formData = new FormData();
+      formData.append("title", this.editValue.title);
+      formData.append("desc", this.editValue.desc);
+      formData.append("section", this.editValue.section);
+
+      if (this.editValue.image instanceof File) {
+        formData.append(
+          "images",this.editValue.image,`${this.editValue.section}_${this.editValue.image.name}`
+        );
+      }
+
+      const result = await axios.put(`${this.url}/component/${this.editValue.id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
 
         if(result.data.id) {
           this.$q.notify({
