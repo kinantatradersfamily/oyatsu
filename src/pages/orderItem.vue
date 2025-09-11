@@ -152,6 +152,7 @@ export default {
         },
         async orderItem() {
             this.forPayload['flavor'] = this.listOfFlavor
+            this.forPayload['status'] = 0 
             const formData = new FormData();
 
             this.forPayload.flavor = JSON.stringify(this.listOfFlavor)
@@ -162,6 +163,14 @@ export default {
             }
             const url = `${this.url}/order/${this.year}/${this.month}`
             const result = await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+
+            if(result) {
+                this.$q.notify({
+                    type: 'positive',
+                    message: 'Your Order Has been process'
+                })
+                this.flavorObj = {}
+            }
 
         },
         editValuePack(obj, condition) {

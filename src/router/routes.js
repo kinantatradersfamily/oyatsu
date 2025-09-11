@@ -6,6 +6,7 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') },
       { path: '/order', component: () => import('pages/orderItem.vue') },
       { path: '/admin', component: () => import('pages/admin/home.vue') },
+      { path: '/track', component: () => import('pages/tracking.vue') },
     ],
   },
   {

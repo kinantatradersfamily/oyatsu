@@ -10,7 +10,7 @@
       <q-drawer v-model="drawer" show-if-above :width="200" :height="1000" :breakpoint="400">
         <q-scroll-area style="height: 100vh; margin-top: 150px; border-right: 1px solid #ddd">
           <q-list padding style="padding: 0px 10px;">
-            <q-expansion-item icon="folder" :label="`Kontent`" expand-separator>
+            <q-expansion-item icon="folder" :label="`Content`" expand-separator>
               <q-item v-ripple>
                 <q-list padding style="padding: 0px 10px;">
                   <q-expansion-item icon="folder" :label="`${year}`" expand-separator>
@@ -18,7 +18,7 @@
                       <q-item-section avatar>
                         <q-icon name="folder" />
                       </q-item-section>
-                      <q-item-section @click="openTable(index)">
+                      <q-item-section @click="openTable(index, 'content')">
                         {{ item }}
                       </q-item-section>
                     </q-item>
@@ -30,12 +30,18 @@
           <q-list padding style="padding: 0px 10px;">
             <q-expansion-item icon="folder" :label="`Order`" expand-separator>
               <q-item v-ripple>
-                <q-item-section avatar>
-                  <q-icon name="folder" />
-                </q-item-section>
-                <q-item-section>
-                 Customer
-                </q-item-section>
+                <q-list padding style="padding: 0px 10px;">
+                  <q-expansion-item icon="folder" :label="`${year}`" expand-separator>
+                    <q-item v-ripple v-for="(item, index) in bulan" :key="index">
+                      <q-item-section avatar>
+                        <q-icon name="folder" />
+                      </q-item-section>
+                      <q-item-section @click="openTable(index, 'order')">
+                        {{ item }}
+                      </q-item-section>
+                    </q-item>
+                  </q-expansion-item>
+                </q-list>
               </q-item>
             </q-expansion-item>
           </q-list>
@@ -51,8 +57,30 @@
           </div>
         </q-img>
       </q-drawer>
-
-      <q-page-container>
+      <q-page-container v-if="content == 'order'">
+        <q-table :data="tableOrder">
+          <template v-slot:body-cell-action="props">
+            <q-td :props="props">
+              <a href="javascript:void(0)" @click="editStatus(props.row, false)"> 
+                Update
+              </a>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-flavor="props">
+            <q-td :props="props">
+              <ul>
+                <li v-for="(data, index) of JSON.parse(props.value)" :key="index">{{ data.flavor }} - {{ data.pack }}pcs - Rp{{ data.price }}</li>
+              </ul>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-status="props">
+            <q-td :props="props">
+              {{ changeFormatStatus(props.value) }}
+            </q-td>
+          </template>
+        </q-table>
+      </q-page-container>
+      <q-page-container v-else>
         <div>
           <span>
             &nbsp; {{ year }} - {{ this.bulan[month] }}
@@ -89,6 +117,28 @@
       </q-page-container>
     </q-layout>
 
+    <q-dialog
+      v-model="medium_second"
+    >
+      <q-card style="width: 700px; max-width: 80vw;">
+        <q-card-section>
+          <div class="text-h6">Medium</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <select name="" id="" v-model="statusOrder" class="form-control">
+            <option value="0">proses</option>
+            <option value="1">dianter</option>
+            <option value="2">selesai</option>
+          </select>
+        </q-card-section>
+
+        <q-card-actions align="right" class="bg-white text-teal">
+          <q-btn flat label="OK" v-close-popup @click="editStatus(null, true)" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <q-dialog v-model="medium">
       <q-card style="width: 700px; max-width: 80vw;">
         <div v-for="(isActive, key) in section" :key="key" >
@@ -120,7 +170,6 @@
                 <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
               </div>
             </div>
-           
             <hr>
           </div>
         </div>
@@ -158,20 +207,51 @@ export default {
         empat: false
       },
       currentMonth: new Date(),
-      bulan: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+
+      
       drawer: false,
       medium: false,
       condition: false,
+      medium_second: false,
       url: process.env.VUE_APP_API_URL,
+      
       year: 2025,
+      month: 0,
+      statusOrder: 0,
+      
+      content: '',
+      
+      bulan: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
       list: [],
       table: [],
-      month: 0,
-      editValue: {}
+      listOrder: [],
+      tableOrder: [],
+      
+
+      editValue: {},
+      editValueStatus: {},
 
     }
   },
   methods: {
+    changeFormatStatus(data) {
+        if(data == 0) return 'Proses'
+        else if(data == 1) return 'Dianter'
+        else return 'Selesai'
+    },
+    async editStatus(props, condition) {
+
+      if(!condition) {
+        this.medium_second = true;
+        this.editValueStatus.id = props.id
+        return
+      }
+    const result = await axios.put(`${this.url}/order/${this.editValueStatus.id}`, {
+      status: this.statusOrder
+    });
+
+    console.log(result)
+    },
     editRow(props, value) {
       this.condition = false;
       let numb = value.match(/\d/g);
@@ -294,16 +374,30 @@ export default {
           })
         }
     },
-    openTable(item) {
-      this.month = item
-      this.table = this.list[this.year][item] || this.dummySection
-      if (Object.keys(this.table).length) {
-        for (const [key, value] of Object.entries(this.table)) {
-          if (this.table[key].length > 0) {
-            this.table[key].forEach(item => {
-              item.action = '';
-            })
+    openTable(item, content) {
+      this.content = content
+      if(content == 'content') {
+        this.month = item
+        this.table = this.list[this.year][item] || this.dummySection
+        if (Object.keys(this.table).length) {
+          for (const [key, value] of Object.entries(this.table)) {
+            if (this.table[key].length > 0) {
+              this.table[key].forEach(item => {
+                item.action = '';
+              })
+            }
           }
+        }
+      } else {
+        this.month = item
+        this.tableOrder = this.listOrder[this.year][item] || []
+        if(this.tableOrder.length > 0) {
+          this.tableOrder = this.tableOrder.map(item => {
+            item.action = ''
+            return item
+          })
+
+          console.log(this.tableOrder)
         }
       }
     },
@@ -317,10 +411,24 @@ export default {
           message: `Failed to Update because ${err}`
         })
       }
+    },
+    async getEventsOrder() {
+      try {
+        const res = await axios.get(`${this.url}/order/${this.year}`)
+        if(res && res.data) {
+          this.listOrder = res.data.message
+        }
+      } catch (err) {
+        this.$q.notify({
+          type: 'negative',
+          message: `Failed to Update because ${err}`
+        })
+      }
     }
   },
   mounted() {
     this.getEvents()
+    this.getEventsOrder()
   }
 }
 </script>
