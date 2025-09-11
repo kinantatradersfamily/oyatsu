@@ -201,11 +201,12 @@ export default {
                 if (item.flavor == this.flavorObj.flavor) {
                     item.pack = parseInt(item.pack) + parseInt(this.flavorObj.pack)
                 }
-
                 return item
             })
           
             if (condition) return
+
+            console.log($('#flavor-select').val())
 
             if(!this.flavorObj.flavor) this.flavorObj.flavor = $('#flavor-select').val()
             this.flavorObj.flavor = JSON.parse(JSON.stringify(this.flavorObj.flavor))
