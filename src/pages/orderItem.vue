@@ -205,10 +205,10 @@ export default {
                 return item
             })
           
-
             if (condition) return
 
             if(!this.flavorObj.flavor) this.flavorObj.flavor = $('#flavor-select').val()
+            this.flavorObj.flavor = JSON.parse(JSON.stringify(this.flavorObj.flavor))
 
             this.listOfFlavor.push(this.flavorObj)
             this.listOfFlavor = this.listOfFlavor.map(item => {
