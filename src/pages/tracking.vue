@@ -24,6 +24,11 @@
                             <h3>Tungguin ya, Lagi Otw anter pesenan kamu nih !!! nanti aku chat ya kalo udah sampai</h3>
                         </div>
                     </div>
+                    <div v-if="item.status == 2">
+                        <div class="callout callout-info">
+                            <h3>Selesai Dehh, jangan lupa instasory ya</h3>
+                        </div>
+                    </div>
                   </q-timeline-entry>
                 </q-timeline>
             </template>
