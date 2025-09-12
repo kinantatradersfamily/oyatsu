@@ -78,6 +78,16 @@
               {{ changeFormatStatus(props.value) }}
             </q-td>
           </template>
+          <template v-slot:body-cell-created_at="props">
+            <q-td :props="props">
+              {{ moment(props.value).format('YYYY-MM-DD HH:mm:ss') }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-updated_at="props">
+            <q-td :props="props">
+              {{ moment(props.value).format('YYYY-MM-DD HH:mm:ss') }}
+            </q-td>
+          </template>
         </q-table>
       </q-page-container>
       <q-page-container v-else>
@@ -185,9 +195,11 @@
 
 <script>
 import axios from "axios";
+import moment from 'moment'
 export default {
   data() {
     return {
+      moment,
       sectionValue: {
         satu: { section: 'section_1', title: '', desc: '', price: '', image: null },
         dua: { section: 'section_2', title: '', desc: '', price: '', image: null },

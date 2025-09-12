@@ -5,13 +5,23 @@
           <input type="text" class="form-control" placeholder="Please Insert Your Email" v-model="inputEmail">
           <br>
           <a href="javascript:void(0)" class="btn btn-primary" @click="getTracking()">Search</a>
-            <template v-if="findStatus">
+            {{ tab }}
+          <template v-if="findStatus">
+                    <q-tabs
+                      v-model="tab"
+                      align="justify"
+                      narrow-indicator
+                      class="q-mb-lg"
+                      style="padding: 10px 20px;margin-top: 10px; border: 1px solid #d2d6de !important;border-radius: 5px;"
+                  >
+                      <q-tab class="text-purple" :name="key" :label="`Orderan ${index + 1}`" v-for="(item, key, index) in groupOrder" :key="index" @click="forGroupOrder(item)"/>
+                  </q-tabs>
                 <q-timeline color="secondary" style="margin-top: 20px;"> 
                   <q-timeline-entry heading>
                     Timeline heading
                   </q-timeline-entry>
       
-                  <q-timeline-entry v-for="(item, index) of data" :key="index" :title="changeStatus(item.status)" :subtitle="moment(item.date).format('YYYY-MM-DD HH:mm')">
+                  <q-timeline-entry v-for="(item, index) of data" :key="index" :title="changeStatus(item.status)" :subtitle="moment(item.date).format('YYYY-MM-DD HH:mm:ss')">
                     <div v-if="item.status == 0">
                        <div class="callout callout-info">
                             <h4 style="color: ;">Pesanan kamu lagi kita siapin ya!!</h4>
@@ -60,9 +70,16 @@ export default {
     data() {
         return {
             moment,
+
             findStatus: false,
+
             url: process.env.VUE_APP_API_URL,
+
+            groupOrder: [],
+
             inputEmail: '',
+            tab: '',
+
             data: {}
         }
     },
@@ -83,22 +100,39 @@ export default {
             try {
                 const email = this.inputEmail;
                 const trackingList = await axios.get(`${this.url}/order/email/${email}/history`);
-
+                let objMantabek = {}
+                
                 if(trackingList.data.history.length > 0) {
-                    this.findStatus = true
-                    trackingList.data.history = trackingList.data.history.map(item => {
-                        item.flavor = JSON.parse(JSON.stringify(item.flavor))
-                        item.total = item.flavor.reduce((acc, flavor) => acc + flavor.price, 0)
-                        return item
+                    trackingList.data.history.forEach(item => {
+                        if(!objMantabek[item.id]) objMantabek[item.id] = []
+                        if(objMantabek[item.id]) objMantabek[item.id].push(item)
                     })
-                    this.data = trackingList.data.history
-                    console.log(this.data)
+                    this.tab = Object.keys(objMantabek)[0]
+                    this.groupOrder = objMantabek
+                    this.data = objMantabek[this.tab]
+                    this.findStatus = true
+                } else {
+                    this.$q.notify({
+                        type: 'negative',
+                        message: 'Pesenan kamu gada nih, coba chat mimin dulu ya buat mastiin'
+                    })
                 }
 
             } catch (err) {
-                console.error("Gagal mengambil data order:", err);
+                this.$q.notify({
+                    type: 'negative',
+                    message: 'Error masa!!! internet kamu kali'
+                })
             }
-        }
+        },
+        forGroupOrder(data) {
+            data = data.map(item => {
+                item.flavor = JSON.parse(JSON.stringify(item.flavor))
+                item.total = item.flavor.reduce((acc, flavor) => acc + flavor.price, 0)
+                return item
+            })
+            this.data = data
+        },
     },
 }
 
