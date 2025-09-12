@@ -244,13 +244,27 @@ export default {
       if(!condition) {
         this.medium_second = true;
         this.editValueStatus.id = props.id
+        this.statusOrder = props.status
         return
       }
-    const result = await axios.put(`${this.url}/order/${this.editValueStatus.id}`, {
-      status: this.statusOrder
-    });
+      try {
+        const result = await axios.put(`${this.url}/order/${this.editValueStatus.id}`, {
+          status: this.statusOrder
+        });
+  
+        if(result.data) {
+          this.$q.notify({
+            type: `positive`,
+            message: `Orderan Berhasil di update`
+          })
+        }
+      } catch(err) {
+        this.$q.notify({
+            type: `negative`,
+            message: `${err.response.data.message}`
+          })
+      }
 
-    console.log(result)
     },
     editRow(props, value) {
       this.condition = false;

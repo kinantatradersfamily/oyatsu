@@ -5,37 +5,28 @@
           <input type="text" class="form-control" placeholder="Please Insert Your Email" v-model="inputEmail">
           <br>
           <a href="javascript:void(0)" class="btn btn-primary" @click="getTracking()">Search</a>
-          <q-timeline color="secondary" v-if="findStatus" style="margin-top: 20px;"> 
-            <q-timeline-entry heading>
-              Timeline heading
-            </q-timeline-entry>
+            <template v-if="findStatus">
+                <q-timeline color="secondary" style="margin-top: 20px;"> 
+                  <q-timeline-entry heading>
+                    Timeline heading
+                  </q-timeline-entry>
       
-            <q-timeline-entry
-              :title="`${changeStatus(data[0].status)}`"
-              :subtitle="`${moment(data[0].updated_at).format('YYYY-MM-DD HH:mm')}`"
-            >
-              <div>
-                <ul>
-                    <li v-for="(item, index) of JSON.parse(data[0].flavor)" :key="index">
-                        {{ item.flavor }} - {{ item.pack }}Pcs
-                    </li>
-                    <b>Total : {{ formatRupiah(JSON.parse(data[0].flavor).reduce((a, b) => a.price + b.price)) }}</b>
-                </ul>
-              </div>
-            </q-timeline-entry>
-      
-            <q-timeline-entry
-              title="Event Title"
-              subtitle="February 21, 1986"
-              icon="delete"
-            >
-              <div>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </div>
-            </q-timeline-entry>
-      
-            
-          </q-timeline>
+                  <q-timeline-entry v-for="(item, index) of data" :key="index" :title="changeStatus(item.status)" :subtitle="moment(item.date).format('YYYY-MM-DD HH:mm')">
+                    <div v-if="item.status == 0">
+                       <div class="callout callout-info">
+                            <h4 style="color: ;">Pesanan kamu lagi kita siapin ya!!</h4>
+                            <p v-for="(pesanan, idx) of item.flavor" :key="idx">{{ pesanan.flavor }} - {{ pesanan.pack }} Packs</p>
+                            <p><b>Total Harga Pesanan Kamu : {{ formatRupiah(item.total) }}</b></p>
+                        </div>
+                    </div>
+                    <div v-if="item.status == 1">
+                        <div class="callout callout-info">
+                            <h3>Tungguin ya, Lagi Otw anter pesenan kamu nih !!! nanti aku chat ya kalo udah sampai</h3>
+                        </div>
+                    </div>
+                  </q-timeline-entry>
+                </q-timeline>
+            </template>
         </div>
         <footerComponent></footerComponent>
 
@@ -86,13 +77,19 @@ export default {
        async getTracking() {
             try {
                 const email = this.inputEmail;
-                const result = await axios.get(`${this.url}/order/by-email/${email}`);
-                if(result.data.length > 0) {
+                const trackingList = await axios.get(`${this.url}/order/email/${email}/history`);
+
+                if(trackingList.data.history.length > 0) {
                     this.findStatus = true
-                    this.data = result.data
+                    trackingList.data.history = trackingList.data.history.map(item => {
+                        item.flavor = JSON.parse(JSON.stringify(item.flavor))
+                        item.total = item.flavor.reduce((acc, flavor) => acc + flavor.price, 0)
+                        return item
+                    })
+                    this.data = trackingList.data.history
+                    console.log(this.data)
                 }
 
-                console.log(result.data.length> 0)
             } catch (err) {
                 console.error("Gagal mengambil data order:", err);
             }

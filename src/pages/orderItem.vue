@@ -23,7 +23,7 @@
                                 <div>
                                     <label for="form-control">Flavor :</label>
                                     <select class="form-control nice-select wide select-flavor" id="flavor-select"
-                                        style="margin-bottom: 0px !important;" v-model="flavorObj.flavor">
+                                        style="margin-bottom: 0px !important;">
                                         <option :value="data" v-for="(data, index) of listFlavor" :key="index">
                                             {{ data }}
                                         </option>
