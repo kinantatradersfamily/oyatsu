@@ -5,7 +5,6 @@
           <input type="text" class="form-control" placeholder="Please Insert Your Email" v-model="inputEmail">
           <br>
           <a href="javascript:void(0)" class="btn btn-primary" @click="getTracking()">Search</a>
-            {{ tab }}
           <template v-if="findStatus">
                     <q-tabs
                       v-model="tab"
@@ -109,6 +108,11 @@ export default {
                     })
                     this.tab = Object.keys(objMantabek)[0]
                     this.groupOrder = objMantabek
+                     objMantabek[this.tab] = objMantabek[this.tab].map(item => {
+                        item.flavor = JSON.parse(JSON.stringify(item.flavor))
+                        item.total = item.flavor.reduce((acc, flavor) => acc + flavor.price, 0)
+                        return item
+                    })
                     this.data = objMantabek[this.tab]
                     this.findStatus = true
                 } else {
