@@ -17,7 +17,7 @@
                                         v-model="forPayload.email" />
                                 </div>
                                 <div>
-                                    <input type="text" class="form-control" placeholder="Your What'sApp Number"
+                                    <input type="number" class="form-control" placeholder="Your What'sApp Number"
                                         v-model="forPayload.phone" />
                                 </div>
                                 <div>
@@ -64,7 +64,7 @@
                                                 </q-badge>
                                                 <b>&nbsp;{{ props.value }}&nbsp;</b>
 
-                                                <q-badge color="red">
+                                                <q-badge color="red" v-if="props.value >= 2">
                                                     <q-icon name="remove" @click="editValuePack(props.row, false)" />
                                                 </q-badge>
 
@@ -84,11 +84,13 @@
                                     <div class="custom-file" style="margin-top: 20px;">
                                         <input type="file" class="custom-file-input" id="inputGroupFile01" @change="onFileChange">
                                         <label class="custom-file-label" for="inputGroupFile01">{{fileLabel}}</label>
-                                        <span style="color: #2A4759">Total nya jadi segini, mohon di transfer dan upload buktinya yaaa !!!
-                                        ke Rekening : 12345 a/n
-                                        Oyatsu</span>
                                     </div>
                                 </div>
+                                 <div class="callout callout-info" style="margin-top: 10px; margin-bottom: 30px;">
+                                            <span style="color: #2A4759">Total nya jadi segini, mohon di transfer dan upload buktinya yaaa !!!
+                                            ke Rekening : 12345 a/n
+                                            Oyatsu</span>
+                                        </div>
                                 <div class="btn_box">
                                     <a href="javascript:void(0)" class="btn btn-warning" @click="orderItem" style="color:white;margin-top:5px;border-radius: 5px !important;">
                                         Order Now
@@ -153,9 +155,10 @@ export default {
             this.fileLabel = e.target.files[0] ? e.target.files[0].name: 'image error';
         },
         async orderItem() {
-            if(this.listOfFlavor.length == 0) return this.$q.notify({type: 'negative', message: 'Orderan mu kosong, check lagi ya'})
             if(!this.forPayload.email) return this.$q.notify({type: 'negative', message: 'Email kamu kosong, check lagi ya'})
             if(!this.forPayload.phone) return this.$q.notify({type: 'negative', message: 'Nomor whatsapp kamu kosong, check lagi ya'})
+            if(this.listOfFlavor.length == 0) return this.$q.notify({type: 'negative', message: 'Orderan mu kosong, check lagi ya'})
+            if(!this.forPayload.document) return this.$q.notify({type: 'negative', message: 'Kamu belum upload bukti TF yaaa'})
 
 
             this.forPayload['flavor'] = this.listOfFlavor
@@ -176,7 +179,10 @@ export default {
                     type: 'positive',
                     message: 'Your Order Has been process'
                 })
+                this.forPayload = {}
+                this.listOfFlavor = []
                 this.flavorObj = {}
+                this.fileLabel = ''
             }
 
         },

@@ -61,9 +61,19 @@
         <q-table :data="tableOrder" :rows-per-page-options="['25', '50', '75', '100']" hide-pagination>
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
-              <a href="javascript:void(0)" @click="editStatus(props.row, false)"> 
+              <a href="javascript:void(0)" @click="editStatus(props.row, false)" class="btn btn-warning" v-if="props.row.status != 2"> 
                 Update
               </a>
+              <span v-else><a href="javascript:void(0)" disabled class="btn btn-primary" style="margin-left: 10px;">Update</a></span>
+              <a v-if="props.row.status == 2 && (props.row.activated == undefined || props.row.activated == null )" href="javascript:void(0)" @click="editActivated(props.row, false)" class="btn btn-success" style="margin-left: 10px;"> 
+                Activatied
+              </a>
+              <span v-else><a href="javascript:void(0)" disabled class="btn btn-primary" style="margin-left: 10px;">Activated</a></span>
+            </q-td>
+          </template>
+           <template v-slot:body-cell-document="props">
+            <q-td :props="props">
+              <a :href="`${url}` + props.value" target="_blank"> {{ props.value }}</a>
             </q-td>
           </template>
           <template v-slot:body-cell-flavor="props">
@@ -132,7 +142,7 @@
     >
       <q-card style="width: 700px; max-width: 80vw;">
         <q-card-section>
-          <div class="text-h6">Medium</div>
+          <div class="text-h6">Update Order</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -145,6 +155,27 @@
 
         <q-card-actions align="right" class="bg-white text-teal">
           <q-btn flat label="OK" v-close-popup @click="editStatus(null, true)" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog
+      v-model="activatedOrderModal"
+    >
+      <q-card style="width: 700px; max-width: 80vw;">
+        <q-card-section>
+          <div class="text-h6">Updated Activated</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <select name="" id="" v-model="activatedOrder" class="form-control">
+            <option value="false">Non-active</option>
+            <option value="true">Active</option>
+          </select>
+        </q-card-section>
+
+        <q-card-actions align="right" class="bg-white text-teal">
+          <q-btn flat label="OK" v-close-popup @click="editActivated(null, true)" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -225,6 +256,9 @@ export default {
       medium: false,
       condition: false,
       medium_second: false,
+      activatedOrder: 0,
+      activatedOrderModal: false,
+
       url: process.env.VUE_APP_API_URL,
       
       year: 2025,
@@ -246,6 +280,31 @@ export default {
     }
   },
   methods: {
+   async editActivated(props, condition) {
+      if(!condition) {
+        this.activatedOrderModal = true;
+        this.editValueStatus.id = props.id
+        this.activatedOrder = props.activated
+        return
+      }
+      try {
+        const result = await axios.put(`${this.url}/order/${this.editValueStatus.id}/activated`, {
+          activated: this.activatedOrder
+        });
+  
+        if(result.data) {
+          this.$q.notify({
+            type: `positive`,
+            message: `Orderan Berhasil di update`
+          })
+        }
+      } catch(err) {
+        this.$q.notify({
+            type: `negative`,
+            message: `${err.response.data.message}`
+          })
+      }
+    },
     changeFormatStatus(data) {
         if(data == 0) return 'Proses'
         else if(data == 1) return 'Dianter'
@@ -276,7 +335,6 @@ export default {
             message: `${err.response.data.message}`
           })
       }
-
     },
     editRow(props, value) {
       this.condition = false;

@@ -110,10 +110,20 @@ export default {
                 const trackingList = await axios.get(`${this.url}/order/email/${email}/history`);
                 let objMantabek = {}
                 
+                
                 if(trackingList.data.history.length > 0) {
-                    trackingList.data.history.forEach(item => {
-                        if(!objMantabek[item.id]) objMantabek[item.id] = []
-                        if(objMantabek[item.id]) objMantabek[item.id].push(item)
+                    const filterActived = trackingList.data.history
+
+                    let condition = filterActived.find(item => item.status == 2 && item.activated == false);
+
+                    filterActived.forEach(item => {
+                        if(condition && condition.id != item.id) {
+                            if(!objMantabek[item.id]) objMantabek[item.id] = []
+                            if(objMantabek[item.id]) objMantabek[item.id].push(item)
+                        } else {
+                            if(!objMantabek[item.id]) objMantabek[item.id] = []
+                            if(objMantabek[item.id]) objMantabek[item.id].push(item)
+                        }
                     })
                     this.tab = Object.keys(objMantabek)[0]
                     this.groupOrder = objMantabek
@@ -123,6 +133,7 @@ export default {
                         return item
                     })
                     this.data = objMantabek[this.tab]
+                    this.data=JSON.parse(JSON.stringify(this.data))
                     this.findStatus = true
                 } else {
                     this.$q.notify({
@@ -132,9 +143,10 @@ export default {
                 }
 
             } catch (err) {
+                console.log(err)
                 this.$q.notify({
                     type: 'negative',
-                    message: 'Error masa!!! internet kamu kali'
+                    message: `Error masa!!! ${err}`
                 })
             }
         },
