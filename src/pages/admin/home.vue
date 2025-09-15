@@ -58,7 +58,7 @@
         </q-img>
       </q-drawer>
       <q-page-container v-if="content == 'order'">
-        <q-table :data="tableOrder">
+        <q-table :data="tableOrder" :rows-per-page-options="['25', '50', '75', '100']" hide-pagination>
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
               <a href="javascript:void(0)" @click="editStatus(props.row, false)"> 

@@ -9,7 +9,7 @@
                     </h2>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="border-right: 1px solid #999;padding-right: 30px;">
+                    <div class="col-md-6">
                         <div class="form_container">
                             <form action="">
                                 <div>
@@ -40,7 +40,11 @@
                                         @click="forList"><span>Submit item</span></button>&nbsp;
 
                                 </div>
-                                <div style="padding: 20px 0px">
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="padding: 0px 0px">
                                     <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"
                                         hide-pagination :columns="columns">
                                         <template v-slot:top-right>
@@ -77,12 +81,12 @@
                                     </q-table>
                                 </div>
                                 <div>
-                                    <div class="custom-file">
+                                    <div class="custom-file" style="margin-top: 20px;">
                                         <input type="file" class="custom-file-input" id="inputGroupFile01" @change="onFileChange">
-                                        <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                                        <span>Total nya jadi segini, mohon di transfer dan upload buktinya yaaa !!! <br>
-                                            ke Rekening : 12345 a/n
-                                            Oyatsu</span>
+                                        <label class="custom-file-label" for="inputGroupFile01">{{fileLabel}}</label>
+                                        <span style="color: #2A4759">Total nya jadi segini, mohon di transfer dan upload buktinya yaaa !!!
+                                        ke Rekening : 12345 a/n
+                                        Oyatsu</span>
                                     </div>
                                 </div>
                                 <div class="btn_box">
@@ -90,16 +94,12 @@
                                         Order Now
                                     </a>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-md-6" style="padding-left: 30px;">
-                        <div class="map_container ">
+                        <!-- <div class="map_container ">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.179845363276!2d106.953797075784!3d-6.370767093619422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c3f5ad239bef%3A0x3f964a11110d743f!2sWhiley!5e0!3m2!1sen!2sid!4v1757409331451!5m2!1sen!2sid"
                                 width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
                                 referrerpolicy="no-referrer-when-downgrade"></iframe>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -142,15 +142,22 @@ export default {
             forPayload: {},
             url: process.env.VUE_APP_API_URL,
             year: 0,
-            month: 0
+            month: 0,
+            fileLabel: 'Choose file'
 
         }
     },
     methods: {
         onFileChange(e, key) {
             this.forPayload.document = e.target.files[0];
+            this.fileLabel = e.target.files[0] ? e.target.files[0].name: 'image error';
         },
         async orderItem() {
+            if(this.listOfFlavor.length == 0) return this.$q.notify({type: 'negative', message: 'Orderan mu kosong, check lagi ya'})
+            if(!this.forPayload.email) return this.$q.notify({type: 'negative', message: 'Email kamu kosong, check lagi ya'})
+            if(!this.forPayload.phone) return this.$q.notify({type: 'negative', message: 'Nomor whatsapp kamu kosong, check lagi ya'})
+
+
             this.forPayload['flavor'] = this.listOfFlavor
             this.forPayload['status'] = 0 
             const formData = new FormData();
@@ -193,7 +200,7 @@ export default {
             }).format(angka);
         },
         forList() {
-            if (this.flavorObj.pack == 0) {
+            if (this.flavorObj.pack <= 0) {
                 this.$q.notify({
                     type: 'negative',
                     message: `Pack Cannot be Empty`
@@ -214,8 +221,6 @@ export default {
             })
           
             if (condition) return
-
-            console.log($('#flavor-select').val())
 
             if(!this.flavorObj.flavor) this.flavorObj.flavor = $('#flavor-select').val()
             this.flavorObj.flavor = JSON.parse(JSON.stringify(this.flavorObj.flavor))

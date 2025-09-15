@@ -2,6 +2,11 @@
     <div>
         <navbarComponent class="custom-navbar"></navbarComponent>
         <div class="q-px-lg q-pb-md" style="padding-top: 20px;margin-top: 20px;">
+            <div class="heading_container heading_center" style="margin-bottom: 55px;">
+                <h2>
+                    Tracking Your Order here !!!!!!!!!
+                </h2>
+            </div>
           <input type="text" class="form-control" placeholder="Please Insert Your Email" v-model="inputEmail">
           <br>
           <a href="javascript:void(0)" class="btn btn-primary" @click="getTracking()">Search</a>
@@ -23,31 +28,35 @@
                   <q-timeline-entry v-for="(item, index) of data" :key="index" :title="changeStatus(item.status)" :subtitle="moment(item.date).format('YYYY-MM-DD HH:mm:ss')">
                     <div v-if="item.status == 0">
                        <div class="callout callout-info">
-                            <h4 style="color: ;">Pesanan kamu lagi kita siapin ya!!</h4>
-                            <p v-for="(pesanan, idx) of item.flavor" :key="idx">{{ pesanan.flavor }} - {{ pesanan.pack }} Packs</p>
+                            <p style="font-weight: bold;">Pesanan kamu lagi kita siapin ya!!</p>
+                            <p v-for="(pesanan, idx) of item.flavor" :key="idx" style="margin-bottom: 3px;color:#2A4759">{{ pesanan.flavor }} - {{ pesanan.pack }} Packs</p>
+                            <br>
                             <p><b>Total Harga Pesanan Kamu : {{ formatRupiah(item.total) }}</b></p>
                         </div>
                     </div>
                     <div v-if="item.status == 1">
                         <div class="callout callout-info">
-                            <h3>Tungguin ya, Lagi Otw anter pesenan kamu nih !!! nanti aku chat ya kalo udah sampai</h3>
+                            <p>Tungguin ya, Lagi Otw anter pesenan kamu nih !!! nanti aku chat ya kalo udah sampai</p>
                         </div>
                     </div>
                     <div v-if="item.status == 2">
                         <div class="callout callout-info">
-                            <h3>Selesai Dehh, jangan lupa instasory ya</h3>
+                            <p>Selesai Dehh, jangan lupa instasory ya</p>
                         </div>
                     </div>
                   </q-timeline-entry>
                 </q-timeline>
             </template>
         </div>
-        <footerComponent></footerComponent>
+        <footerComponent class="custom-footer"></footerComponent>
 
     </div>
 </template>
 
 <style scoped>
+.custom-footer {
+    margin-top: 20px;
+}
 .custom-navbar {
     background-color: black !important;
 }
