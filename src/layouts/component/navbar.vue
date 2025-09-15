@@ -2,7 +2,7 @@
     <header class="header_section">
       <div class="container">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="javascript:void(0)">
             <img src="./../../assets/images/image-removebg-preview.png" alt="" style="width: 15vh;">
           </a>
 

@@ -86,7 +86,7 @@
                                         <label class="custom-file-label" for="inputGroupFile01">{{fileLabel}}</label>
                                     </div>
                                 </div>
-                                 <div class="callout callout-info" style="margin-top: 10px; margin-bottom: 30px;">
+                                 <div class="callout callout-info" style="margin-top: 10px; margin-bottom: 30px;" v-if="listOfFlavor.length > 0">
                                             <span style="color: #2A4759">Total nya jadi segini, mohon di transfer dan upload buktinya yaaa !!!
                                             ke Rekening : 12345 a/n
                                             Oyatsu</span>
