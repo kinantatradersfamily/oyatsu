@@ -26,9 +26,6 @@
                     <p>
                       {{ value.desc }}
                     </p>
-                    <div class="btn-box">
-                      <a href="" class="btn1">Order Now</a>
-                    </div>
                   </div>
                 </div>
               </div>

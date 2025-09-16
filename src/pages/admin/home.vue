@@ -44,6 +44,16 @@
                 </q-list>
               </q-item>
             </q-expansion-item>
+            <q-expansion-item icon="folder" :label="`Grafik`" expand-separator>
+               <q-item v-ripple v-for="(data, index) of listOrder" :key="index">
+                <q-item-section avatar>
+                    <q-icon name="folder" />
+                  </q-item-section>
+                  <q-item-section @click="openTable(index, 'grafik')">
+                    {{ index }}
+                  </q-item-section>
+               </q-item>
+            </q-expansion-item>
           </q-list>
         </q-scroll-area>
 
@@ -52,13 +62,23 @@
             <q-avatar size="56px" class="q-mb-sm">
               <img src="https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>
-            <div class="text-weight-bold">Razvan Stoenescu</div>
-            <div>@rstoenescu</div>
+            <div class="text-weight-bold">Oyatsu Admin</div>
+            <div>@oyatsu</div>
           </div>
         </q-img>
       </q-drawer>
-      <q-page-container v-if="content == 'order'">
-        <q-table :data="tableOrder" :rows-per-page-options="['25', '50', '75', '100']" hide-pagination>
+      <q-page-container v-if="content == 'grafik'">
+        <div class="filter-grafik" style="padding: 20px;">
+          <a href="javascript:void(0)" class="btn btn-primary" v-for="data in 12" :key="data" style="margin-right: 10px;" @click="dataFilterChart(data)">
+             {{ bulan[data-1] }}
+           </a>
+        </div>
+        <div class="q-pa-md">
+          <canvas ref="chartCanvas"></canvas>
+        </div>
+      </q-page-container>
+      <q-page-container v-else-if="content == 'order'">
+        <q-table :data="tableOrder" :rows-per-page-options="[0]"  class="my-sticky-virtscroll-table" virtual-scroll :pagination.sync="pagination" :virtual-scroll-sticky-size-start="48">
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
               <a href="javascript:void(0)" @click="editStatus(props.row, false)" class="btn btn-warning" v-if="props.row.status != 2"> 
@@ -227,7 +247,10 @@
 <script>
 import axios from "axios";
 import moment from 'moment'
+import Chart from "chart.js";
+
 export default {
+  
   data() {
     return {
       moment,
@@ -249,6 +272,11 @@ export default {
         tiga: false,
         empat: false
       },
+
+      pagination: {
+        rowsPerPage: 0
+      },
+
       currentMonth: new Date(),
 
       
@@ -259,9 +287,11 @@ export default {
       activatedOrder: 0,
       activatedOrderModal: false,
 
+      myChart:null,
+
       url: process.env.VUE_APP_API_URL,
       
-      year: 2025,
+      year: 0,
       month: 0,
       statusOrder: 0,
       
@@ -272,14 +302,104 @@ export default {
       table: [],
       listOrder: [],
       tableOrder: [],
-      
 
+      grafikOrderArr: {},
       editValue: {},
       editValueStatus: {},
 
     }
   },
   methods: {
+    dataFilterChart(data) {
+      if(data == 'all') {
+        this.grafikOrderArr.data = []
+
+        for(const[key, value] of Object.entries(this.listOrder)) {
+          for(const[key1, value1] of Object.entries(value)) {
+            value1.forEach(item => {
+              const data = JSON.parse(item.flavor).map(item => parseInt(item.pack)).reduce((a,b) => a + b)
+              this.grafikOrderArr.data.push(data)
+            })
+          }
+        }
+        this.declareChart()
+        return
+      }
+
+      const obj = this.listOrder[this.year]
+      if(obj[data-1]) {
+        this.grafikOrderArr.data = []
+        this.grafikOrderArr.label = []
+
+        obj[data-1].forEach(item => {
+          const data = JSON.parse(item.flavor).map(item => parseInt(item.pack)).reduce((a,b) => a + b)
+          this.grafikOrderArr.data.push(data)
+        })
+        const grafik = obj[data-1].map(item => moment(item.created_at).unix())
+        this.grafikOrderArr.label.push(...grafik)
+        this.declareChart()
+      }
+    },
+    declareChart() {
+      this.$nextTick(() => {
+        if (this.myChart) {
+          this.myChart.destroy();
+        }
+
+        const ctx = this.$refs.chartCanvas.getContext("2d");
+        this.myChart = new Chart(ctx, {
+          type: "line", 
+          data: {
+            labels: this.grafikOrderArr.label,
+            datasets: [
+              {
+                label: "Order'an",
+                data: this.grafikOrderArr.data,
+              },
+            ],
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+              x: {
+                grid: {
+                  display: false 
+                },
+                ticks: {
+                  maxTicksLimit: 3,
+                  callback: (value, index, ticks) => {
+                    return moment(this.grafikOrderArr.label[index] * 1000).format('LL');
+                  },
+                }
+              },
+              y: {
+                ticks: {
+                  maxTicksLimit: 4
+                },
+                grid: {
+                  display: false
+                }
+              }
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  title: (tooltipItems) => {
+                    const data = tooltipItems[0]
+                    return moment(data.label * 1000).format('YYYY-MM-DD HH:mm:ss');
+                  },
+                  label: (tooltipItem) => {
+                    return `Jumlah: ${tooltipItem.parsed.y}`;
+                  }
+                }
+              }
+            }
+          },
+        });
+      })
+    
+    },
    async editActivated(props, condition) {
       if(!condition) {
         this.activatedOrderModal = true;
@@ -472,6 +592,8 @@ export default {
             }
           }
         }
+      } else if(content == 'grafik') {
+        this.dataFilterChart('all') 
       } else {
         this.month = item
         this.tableOrder = this.listOrder[this.year][item] || []
@@ -480,8 +602,6 @@ export default {
             item.action = ''
             return item
           })
-
-          console.log(this.tableOrder)
         }
       }
     },
@@ -511,6 +631,9 @@ export default {
     }
   },
   mounted() {
+    const date = new Date()
+    this.year = date.getFullYear()
+    
     this.getEvents()
     this.getEventsOrder()
   }

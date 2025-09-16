@@ -45,12 +45,11 @@
                     </div>
                     <div class="col-md-6">
                         <div style="padding: 0px 0px">
-                                    <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"
+                                    <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"  dense
                                         hide-pagination :columns="columns">
                                         <template v-slot:top-right>
-                                            <button type="button" class="btn btn-primary"
-                                                style="border-radius: 5px;background-color:chocolate;text-align: left;text-transform: none;padding:7px 10px; margin-right:5px"
-                                                @click="listOfFlavor = []"><span>Reset</span></button>
+                                            <a type="button" class="btn btn-success" href="javascript:void(0)" style="margin-right: 10px;"
+                                                @click="listOfFlavor = []"><span>Reset</span></a>
                                         </template>
                                         <template v-slot:body-cell-price="props">
                                             <q-td :props="props">
@@ -136,13 +135,19 @@ export default {
                 flavor: '',
                 pack: 0
             },
+
             confirm: false,
             left2: true,
+
             listFlavor: ['Vanilla', 'Chocolate', 'Cheese'],
             columns: [],
             listOfFlavor: [],
+
             forPayload: {},
+
             url: process.env.VUE_APP_API_URL,
+            main_price: process.env.OYATSU_PRICE,
+
             year: 0,
             month: 0,
             fileLabel: 'Choose file'
@@ -218,7 +223,7 @@ export default {
                     if (condition) item.pack = parseInt(item.pack) + 1;
                     else item.pack = parseInt(item.pack) - 1;
 
-                    item.price = 70000 * parseInt(item.pack)
+                    item.price = this.main_price * parseInt(item.pack)
                 }
                 return item
             })
@@ -258,7 +263,7 @@ export default {
 
             this.listOfFlavor.push(this.flavorObj)
             this.listOfFlavor = this.listOfFlavor.map(item => {
-                item['price'] = 70000 * parseInt(item.pack)
+                item['price'] = this.main_price * parseInt(item.pack)
                 return item
             })
              this.flavorObj = {
@@ -274,6 +279,7 @@ export default {
         }
     },
     mounted() {
+        console.log(this.main_price)
         const date = new Date()
         this.year = date.getFullYear()
         this.month = date.getMonth()
