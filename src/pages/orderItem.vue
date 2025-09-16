@@ -11,7 +11,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form_container">
-                            <form action="">
+                            
                                 <div>
                                     <input type="email" class="form-control" placeholder="Your Email"
                                         v-model="forPayload.email" />
@@ -23,27 +23,52 @@
                                 <div>
                                     <label for="form-control">Flavor :</label>
                                     <select class="form-control nice-select wide select-flavor" id="flavor-select"
-                                        style="margin-bottom: 0px !important;">
+                                        style="margin-bottom: 0px !important;" v-model="contentFlavor">
+                                        <option :value="'0'" disabled>Choose Your Flavor</option>
+
                                         <option :value="data" v-for="(data, index) of listFlavor" :key="index">
                                             {{ data }}
                                         </option>
                                     </select>
                                 </div>
-                                <div>
+                                <div v-if="contentFlavor != 'Mix'">
                                     <label for="form-control">Pack :</label>
                                     <input type="number" class="form-control" v-model="flavorObj.pack"
                                         style="margin-bottom:0px">
                                 </div>
-                                <div>
+                                <div v-if="contentFlavor != 'Mix'">
                                     <button type="button" class="btn btn-primary"
                                         style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 10px 15px"
                                         @click="forList"><span>Submit item</span></button>&nbsp;
 
                                 </div>
-                            </form>
                         </div>
                     </div>
                     <div class="col-md-6">
+                          <div style="margin-bottom: 15px;" v-if="contentFlavor == 'Mix'">
+                            <q-table :title="`\u00A0 Mix`" :data="mixFlavor" row-key="id"  dense
+                                hide-pagination>
+                                <template v-slot:body-cell-pcs="props">
+                                    <q-td :props="props">
+                                        <q-badge color="green">
+                                            <q-icon name="add" @click="editMixValue(props.row, true)" />
+                                        </q-badge>
+                                        <b>&nbsp;{{ props.value }}&nbsp;</b>
+
+                                        <q-badge color="red" v-if="props.value >= 1">
+                                            <q-icon name="remove" @click="editMixValue(props.row, false)" />
+                                        </q-badge>
+
+                                    </q-td>
+                                    </template>
+                                </q-table>
+                            </div>
+                            <div v-if="contentFlavor == 'Mix'" style="margin-bottom: 10px;">
+                                    <button type="button" class="btn btn-primary"
+                                        style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 10px 15px"
+                                        @click="forMix"><span>Submit item</span></button>&nbsp;
+
+                                </div>
                         <div style="padding: 0px 0px">
                                     <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"  dense
                                         hide-pagination :columns="columns">
@@ -136,12 +161,25 @@ export default {
                 pack: 0
             },
 
+            contentFlavor: 0,
+
             confirm: false,
             left2: true,
 
-            listFlavor: ['Vanilla', 'Chocolate', 'Cheese'],
+            listFlavor: ['Vanilla', 'Chocolate', 'Cheese', 'Mix'],
             columns: [],
             listOfFlavor: [],
+            mixFlavor: [
+                {
+                    flavor: 'Vanilla', pcs: 0
+                },
+                 {
+                    flavor: 'Chocolate', pcs: 0
+                },
+                 {
+                    flavor: 'Cheese', pcs: 0
+                },
+            ],
 
             forPayload: {},
 
@@ -155,6 +193,53 @@ export default {
         }
     },
     methods: {
+        forMix() {
+            const data = this.mixFlavor.map(item => item.pcs).reduce((a,b) => a+b)
+            if(data != 7) return this.$q.notify({type: 'negative', message: 'item kamu kurang/lebih tuh, harus berjumlah 7 ya'})
+
+            let mix = 'Mix('
+            this.mixFlavor.forEach((item, index) => {
+                if(index == this.mixFlavor.length - 1) {
+                    mix += `${item.flavor} ${item.pcs}pcs`
+
+                } else {
+                    mix += `${item.flavor} ${item.pcs}pcs - `
+                }
+            })
+
+            mix += ')'
+
+           this.flavorObj.flavor = mix  
+           this.flavorObj.pack = 1
+
+           this.listOfFlavor.push(this.flavorObj)
+            this.listOfFlavor = this.listOfFlavor.map(item => {
+                item['price'] = this.main_price * parseInt(item.pack)
+                return item
+            })
+            const columnsTable = [
+                { name: 'flavor', align: 'center', label: 'Flavor', field: 'flavor', sortable: true },
+                { name: 'pack', align: 'center', label: 'Pack', field: 'pack', sortable: true },
+                { name: 'price', align: 'center', label: 'Price', field: 'price', sortable: true },
+            ]
+            this.columns = columnsTable
+            
+            this.flavorObj = {
+                flavor: '',
+                pack: 0
+            }
+
+
+        },
+        editMixValue(data, condition) {
+            this.mixFlavor = this.mixFlavor.map(item => {
+                if(item.flavor == data.flavor) {
+                    if(condition)item.pcs++;
+                    else --item.pcs;
+                }
+                return item
+            })
+        },
         onFileChange(e, key) {
             this.forPayload.document = e.target.files[0];
             this.fileLabel = e.target.files[0] ? e.target.files[0].name: 'image error';
@@ -205,6 +290,18 @@ export default {
                     this.listOfFlavor = []
                     this.flavorObj = {}
                     this.fileLabel = ''
+                    this.contentFlavor = 0
+                    this.mixFlavor = [
+                        {
+                            flavor: 'Vanilla', pcs: 0
+                        },
+                        {
+                            flavor: 'Chocolate', pcs: 0
+                        },
+                        {
+                            flavor: 'Cheese', pcs: 0
+                        },
+                    ]
                 } else {
                     this.$q.loading.hide()
                 }
