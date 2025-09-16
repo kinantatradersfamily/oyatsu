@@ -155,36 +155,61 @@ export default {
             this.fileLabel = e.target.files[0] ? e.target.files[0].name: 'image error';
         },
         async orderItem() {
-            if(!this.forPayload.email) return this.$q.notify({type: 'negative', message: 'Email kamu kosong, check lagi ya'})
-            if(!this.forPayload.phone) return this.$q.notify({type: 'negative', message: 'Nomor whatsapp kamu kosong, check lagi ya'})
-            if(this.listOfFlavor.length == 0) return this.$q.notify({type: 'negative', message: 'Orderan mu kosong, check lagi ya'})
-            if(!this.forPayload.document) return this.$q.notify({type: 'negative', message: 'Kamu belum upload bukti TF yaaa'})
+            this.$q.loading.show()
+            if(!this.forPayload.email) { 
+                this.$q.loading.hide()
+                return this.$q.notify({type: 'negative', message: 'Email kamu kosong, check lagi ya'})
+            }
+            if(!this.forPayload.phone) {
+                this.$q.loading.hide()
+                return this.$q.notify({type: 'negative', message: 'Nomor whatsapp kamu kosong, check lagi ya'})
+            }
+            if(this.listOfFlavor.length == 0) {
+                this.$q.loading.hide()
+                return this.$q.notify({type: 'negative', message: 'Orderan mu kosong, check lagi ya'})
+            }
+
+            if(!this.forPayload.document) {
+                this.$q.loading.hide()
+                return this.$q.notify({type: 'negative', message: 'Kamu belum upload bukti TF yaaa'})
+            }
 
 
             this.forPayload['flavor'] = this.listOfFlavor
             this.forPayload['status'] = 0 
             const formData = new FormData();
 
-            this.forPayload.flavor = JSON.stringify(this.listOfFlavor)
+            try{
+                this.forPayload.flavor = JSON.stringify(this.listOfFlavor)
+                formData.append("sections", JSON.stringify(this.forPayload));
 
-            formData.append("sections", JSON.stringify(this.forPayload));
-            if (this.forPayload.document && this.forPayload.document instanceof File) {
-                formData.append("images",  this.forPayload.document, `${this.forPayload.document.name}`);
-            }
-            const url = `${this.url}/order/${this.year}/${this.month}`
-            const result = await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+                if (this.forPayload.document && this.forPayload.document instanceof File) {
+                    formData.append("images",  this.forPayload.document, `${this.forPayload.document.name}`);
+                }
+                const url = `${this.url}/order/${this.year}/${this.month}`
+                const result = await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
 
-            if(result) {
+                if(result) {
+                    this.$q.loading.hide()
+
+                    this.$q.notify({
+                        type: 'positive',
+                        message: 'Your Order Has been process'
+                    })
+                    this.forPayload = {}
+                    this.listOfFlavor = []
+                    this.flavorObj = {}
+                    this.fileLabel = ''
+                } else {
+                    this.$q.loading.hide()
+                }
+            } catch(err) {
+                this.$q.loading.hide()
                 this.$q.notify({
-                    type: 'positive',
-                    message: 'Your Order Has been process'
+                    type: 'negative',
+                    message: `${err}`
                 })
-                this.forPayload = {}
-                this.listOfFlavor = []
-                this.flavorObj = {}
-                this.fileLabel = ''
             }
-
         },
         editValuePack(obj, condition) {
             this.listOfFlavor = this.listOfFlavor.map(item => {

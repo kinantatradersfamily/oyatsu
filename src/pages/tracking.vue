@@ -4,7 +4,7 @@
         <div class="q-px-lg q-pb-md" style="padding-top: 20px;margin-top: 20px;">
             <div class="heading_container heading_center" style="margin-bottom: 55px;">
                 <h2>
-                    Tracking Your Order here !!!!!!!!!
+                    Track Your Order here !!
                 </h2>
             </div>
           <input type="text" class="form-control" placeholder="Please Insert Your Email" v-model="inputEmail">
@@ -105,15 +105,18 @@ export default {
             else return 'Selesai'
         },
        async getTracking() {
+        this.$q.loading.show()
             try {
                 const email = this.inputEmail;
                 const trackingList = await axios.get(`${this.url}/order/email/${email}/history`);
+                    this.$q.loading.hide()
                 let objMantabek = {}
                 
                 
                 if(trackingList.data.history.length > 0) {
-                    const filterActived = trackingList.data.history
+                    this.$q.loading.hide()
 
+                    const filterActived = trackingList.data.history
                     let condition = filterActived.find(item => item.status == 2 && item.activated == false);
 
                     filterActived.forEach(item => {
@@ -136,6 +139,7 @@ export default {
                     this.data=JSON.parse(JSON.stringify(this.data))
                     this.findStatus = true
                 } else {
+                    this.$q.loading.hide()
                     this.$q.notify({
                         type: 'negative',
                         message: 'Pesenan kamu gada nih, coba chat mimin dulu ya buat mastiin'
@@ -143,7 +147,7 @@ export default {
                 }
 
             } catch (err) {
-                console.log(err)
+                this.$q.loading.hide()
                 this.$q.notify({
                     type: 'negative',
                     message: `Error masa!!! ${err}`
