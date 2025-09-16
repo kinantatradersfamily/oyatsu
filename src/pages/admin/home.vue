@@ -355,6 +355,7 @@ export default {
               {
                 label: "Order'an",
                 data: this.grafikOrderArr.data,
+                pointRadius: 0, 
               },
             ],
           },
