@@ -59,7 +59,8 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'hash',
       publicPath: '',
       env: {
-        VUE_APP_API_URL: 'https://backoffice-oyatsu-production.up.railway.app'
+        VUE_APP_API_URL: 'https://backoffice-oyatsu-production.up.railway.app',
+        OYATSU_PRICE: 75000
       },
 
       // transpile: false,
