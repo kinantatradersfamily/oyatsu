@@ -367,7 +367,7 @@ export default {
                   display: false 
                 },
                 ticks: {
-                  maxTicksLimit: 3,
+                  maxTicksLimit: 10,
                   callback: (value, index, ticks) => {
                     return moment(this.grafikOrderArr.label[index] * 1000).format('LL');
                   },
@@ -375,7 +375,7 @@ export default {
               },
               y: {
                 ticks: {
-                  maxTicksLimit: 4
+                  maxTicksLimit: 10
                 },
                 grid: {
                   display: false
