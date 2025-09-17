@@ -11,64 +11,46 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form_container">
-                            
-                                <div>
-                                    <input type="email" class="form-control" placeholder="Your Email"
-                                        v-model="forPayload.email" />
-                                </div>
-                                <div>
-                                    <input type="number" class="form-control" placeholder="Your What'sApp Number"
-                                        v-model="forPayload.phone" />
-                                </div>
-                                <div>
-                                    <label for="form-control">Flavor :</label>
-                                    <select class="form-control nice-select wide select-flavor" id="flavor-select"
-                                        style="margin-bottom: 0px !important;" v-model="contentFlavor">
-                                        <option :value="'0'" disabled>Choose Your Flavor</option>
+                            <div>
+                                <input type="email" class="form-control" placeholder="Your Email"
+                                    v-model="forPayload.email" />
+                            </div>
+                            <div>
+                                <input type="number" class="form-control" placeholder="Your What'sApp Number"
+                                    v-model="forPayload.phone" />
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                        <q-table :title="`\u00A0 Mix`" :data="mixFlavor" :columns="columnFlavor" row-key="id"  dense
+                            hide-pagination>
+                            <template v-slot:body-cell-pcs="props">
+                                <q-td :props="props">
+                                    <q-badge color="green">
+                                        <q-icon name="add" @click="editMixValue(props.row, true)" />
+                                    </q-badge>
+                                    <b>&nbsp;{{ props.value }}&nbsp;</b>
 
-                                        <option :value="data" v-for="(data, index) of listFlavor" :key="index">
-                                            {{ data }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div v-if="contentFlavor != 'Mix'">
-                                    <label for="form-control">Pack :</label>
-                                    <input type="number" class="form-control" v-model="flavorObj.pack"
-                                        style="margin-bottom:0px">
-                                </div>
-                                <div v-if="contentFlavor != 'Mix'">
-                                    <button type="button" class="btn btn-primary"
-                                        style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 10px 15px"
-                                        @click="forList"><span>Submit item</span></button>&nbsp;
+                                    <q-badge color="red" v-if="props.value >= 1">
+                                        <q-icon name="remove" @click="editMixValue(props.row, false)" />
+                                    </q-badge>
 
-                                </div>
+                                </q-td>
+                                </template>
+                                <template v-slot:body-cell-action="props">
+                                    <q-td :props="props">
+                                        <a href="javascript:void(0)" class="btn btn-success" style="padding: 1px 10px; font-size: 10px;" @click="allPcs(props.row, true)">Add All</a>
+                                        <a href="javascript:void(0)" class="btn btn-danger" style="padding: 1px 10px; font-size: 10px;margin-left: 10px;" @click="allPcs(props.row, false)">Delete All</a>
+                                    </q-td>
+                                </template>
+                            </q-table>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <button type="button" class="btn btn-primary"
+                                style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 10px 15px"
+                                @click="forMix"><span>Submit item</span></button>&nbsp;
                         </div>
                     </div>
                     <div class="col-md-6">
-                          <div style="margin-bottom: 15px;" v-if="contentFlavor == 'Mix'">
-                            <q-table :title="`\u00A0 Mix`" :data="mixFlavor" row-key="id"  dense
-                                hide-pagination>
-                                <template v-slot:body-cell-pcs="props">
-                                    <q-td :props="props">
-                                        <q-badge color="green">
-                                            <q-icon name="add" @click="editMixValue(props.row, true)" />
-                                        </q-badge>
-                                        <b>&nbsp;{{ props.value }}&nbsp;</b>
-
-                                        <q-badge color="red" v-if="props.value >= 1">
-                                            <q-icon name="remove" @click="editMixValue(props.row, false)" />
-                                        </q-badge>
-
-                                    </q-td>
-                                    </template>
-                                </q-table>
-                            </div>
-                            <div v-if="contentFlavor == 'Mix'" style="margin-bottom: 10px;">
-                                    <button type="button" class="btn btn-primary"
-                                        style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 10px 15px"
-                                        @click="forMix"><span>Submit item</span></button>&nbsp;
-
-                                </div>
                         <div style="padding: 0px 0px">
                                     <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"  dense
                                         hide-pagination :columns="columns">
@@ -171,14 +153,19 @@ export default {
             listOfFlavor: [],
             mixFlavor: [
                 {
-                    flavor: 'Vanilla', pcs: 0
+                    flavor: 'Vanilla', pcs: 0, action: ''
                 },
                  {
-                    flavor: 'Chocolate', pcs: 0
+                    flavor: 'Chocolate', pcs: 0, action: ''
                 },
                  {
-                    flavor: 'Cheese', pcs: 0
+                    flavor: 'Cheese', pcs: 0, action: ''
                 },
+            ],
+            columnFlavor: [
+                { name: 'flavor', align: 'center', label: 'Flavor', field: 'flavor', sortable: true },
+                { name: 'pcs', align: 'center', label: 'Pcs', field: 'pcs', sortable: true },
+                { name: 'action', align: 'center', label: 'Action', field: 'action', sortable: true },
             ],
 
             forPayload: {},
@@ -193,23 +180,49 @@ export default {
         }
     },
     methods: {
-        forMix() {
-            const data = this.mixFlavor.map(item => item.pcs).reduce((a,b) => a+b)
-            if(data != 7) return this.$q.notify({type: 'negative', message: 'item kamu kurang/lebih tuh, harus berjumlah 7 ya'})
+        allPcs(props, condition) {
 
-            let mix = 'Mix('
-            this.mixFlavor.forEach((item, index) => {
-                if(index == this.mixFlavor.length - 1) {
-                    mix += `${item.flavor} ${item.pcs}pcs`
+            if(condition) {
+                this.maxFlavor = this.mixFlavor.map(item => {
+                    if(item.flavor == props.flavor) {
+                        item.pcs = 7
+                    }
+    
+                    return item
+                })
 
-                } else {
-                    mix += `${item.flavor} ${item.pcs}pcs - `
+                return
+            }
+
+            this.maxFlavor = this.mixFlavor.map(item => {
+                if(item.flavor == props.flavor) {
+                    item.pcs = 0
                 }
             })
 
-            mix += ')'
+        },
+        forMix() {
+            const data = this.mixFlavor.map(item => item.pcs).reduce((a,b) => a+b)
+            if(data < 7) return this.$q.notify({type: 'negative', message: 'item kamu ada yang kurang tuh, total harus berjumlah 7 ya'})
+            if(data > 7) return this.$q.notify({type: 'negative', message: 'item kamu ada yang lebih tuh, total harus berjumlah 7 ya'})
 
-           this.flavorObj.flavor = mix  
+            let condition = false
+            let tempFlavor = ''
+
+            let mix = 'Mix( '
+            this.mixFlavor.forEach(item => {
+                if(item.pcs == 7) {
+                    tempFlavor = item.flavor
+                    condition = true
+                } else {
+                    if(item.pcs > 0) {
+                        mix += `${item.flavor} ${item.pcs}pcs | `
+                    }
+                }
+            })
+            mix += ' )'
+
+           this.flavorObj.flavor = condition ? tempFlavor : mix  
            this.flavorObj.pack = 1
 
            this.listOfFlavor.push(this.flavorObj)
@@ -332,48 +345,6 @@ export default {
                 minimumFractionDigits: 0,
             }).format(angka);
         },
-        forList() {
-            if (this.flavorObj.pack <= 0) {
-                this.$q.notify({
-                    type: 'negative',
-                    message: `Pack Cannot be Empty`
-                })
-                return
-            }
-
-            let condition = false
-            if(this.listOfFlavor && this.listOfFlavor.length > 0) {
-                condition = this.listOfFlavor.some(item => item.flavor == this.flavorObj.flavor)
-            }
-            
-            this.listOfFlavor = this.listOfFlavor.map(item => {
-                if (item.flavor == this.flavorObj.flavor) {
-                    item.pack = parseInt(item.pack) + parseInt(this.flavorObj.pack)
-                }
-                return item
-            })
-          
-            if (condition) return
-
-            if(!this.flavorObj.flavor) this.flavorObj.flavor = $('#flavor-select').val()
-            this.flavorObj.flavor = JSON.parse(JSON.stringify(this.flavorObj.flavor))
-
-            this.listOfFlavor.push(this.flavorObj)
-            this.listOfFlavor = this.listOfFlavor.map(item => {
-                item['price'] = this.main_price * parseInt(item.pack)
-                return item
-            })
-             this.flavorObj = {
-                flavor: '',
-                pack: 0
-            }
-            const columnsTable = [
-                { name: 'flavor', align: 'center', label: 'Flavor', field: 'flavor', sortable: true },
-                { name: 'pack', align: 'center', label: 'Pack', field: 'pack', sortable: true },
-                { name: 'price', align: 'center', label: 'Price', field: 'price', sortable: true },
-            ]
-            this.columns = columnsTable
-        }
     },
     mounted() {
         console.log(this.main_price)

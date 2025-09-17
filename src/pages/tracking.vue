@@ -2,7 +2,7 @@
     <div>
         <navbarComponent class="custom-navbar"></navbarComponent>
         <div class="q-px-lg q-pb-md" style="padding-top: 20px;margin-top: 20px;">
-            <div class="heading_container heading_center" style="margin-bottom: 55px;">
+            <div class="heading_container heading_center" style="margin-bottom: 65px;">
                 <h2>
                     Track Your Order here !!
                 </h2>
