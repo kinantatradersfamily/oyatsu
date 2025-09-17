@@ -41,7 +41,7 @@
                     </div>
                     <div v-if="item.status == 2">
                         <div class="callout callout-info">
-                            <p>Selesai Dehh, jangan lupa instasory ya</p>
+                            <p>Selesai Dehh, jangan lupa instastory ya</p>
                         </div>
                     </div>
                   </q-timeline-entry>
