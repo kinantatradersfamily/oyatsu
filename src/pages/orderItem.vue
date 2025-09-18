@@ -45,18 +45,19 @@
                             </q-table>
                         </div>
                         <div style="margin-bottom: 10px;">
-                            <button type="button" class="btn btn-primary"
-                                style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 10px 15px"
-                                @click="forMix"><span>Submit item</span></button>&nbsp;
+                            <a href="javascript:void(0)" type="button" class="btn btn-primary"
+                                style="border-radius: 5px;background-color:darkcyan;text-align: left;text-transform: none;padding: 5px 10px"
+                                @click="forMix"><span>Submit</span></a>&nbsp;
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div style="padding: 0px 0px">
-                                    <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"  dense
+                                    <q-table :title="`\u00A0 Payment Bill`" :data="listOfFlavor" row-key="id"  dense   no-data-label="I didn't find anything for you"
+      no-results-label="The filter didn't uncover any results"
                                         hide-pagination :columns="columns">
                                         <template v-slot:top-right>
-                                            <a type="button" class="btn btn-success" href="javascript:void(0)" style="margin-right: 10px;"
-                                                @click="listOfFlavor = []"><span>Reset</span></a>
+                                            <span type="button"  href="javascript:void(0)" style="margin-right: 10px;text-decoration: underline;color:cadetblue"
+                                                @click="listOfFlavor = []">Reset</span>
                                         </template>
                                         <template v-slot:body-cell-price="props">
                                             <q-td :props="props">
@@ -83,6 +84,15 @@
                                                         (row.price || 0), 0))}}
                                                 </q-td>
                                             </q-tr>
+                                        </template>
+                                         <template v-slot:no-data="{ icon, message, filter }">
+                                            <div class="full-width row flex-center text-accent q-gutter-sm">
+                                            <q-icon size="2em" name="sentiment_dissatisfied" />
+                                            <span>
+                                                Well this is sad... {{ message }}
+                                            </span>
+                                            <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
+                                            </div>
                                         </template>
                                     </q-table>
                                 </div>
@@ -153,13 +163,25 @@ export default {
             listOfFlavor: [],
             mixFlavor: [
                 {
-                    flavor: 'Vanilla', pcs: 0, action: ''
+                    flavor: 'Creamcheese', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Cookies and Cream', pcs: 0, action: ''
                 },
                  {
                     flavor: 'Chocolate', pcs: 0, action: ''
                 },
                  {
-                    flavor: 'Cheese', pcs: 0, action: ''
+                    flavor: 'Lemon Curd', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Lemongrass Yoghurt', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Vanilla', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Kolak', pcs: 0, action: ''
                 },
             ],
             columnFlavor: [

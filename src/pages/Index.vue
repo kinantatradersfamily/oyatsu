@@ -229,13 +229,12 @@
 
   <!-- about section -->
 
-  <section class="about_section layout_padding">
+  <section class="about_section layout_padding" style="padding: 0px">
     <div class="container  ">
-
       <div class="row">
         <div class="col-md-6 ">
           <div class="img-box">
-            <img src="../assets/images/grafik_sus.png" alt="">
+            <img :src="`${url}` + section4desc.image" alt="">
           </div>
         </div>
         <div class="col-md-6">
