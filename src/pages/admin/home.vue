@@ -228,7 +228,7 @@
             <div class="input-group mb-3" style="padding: 0px 10px;" v-if="!section.satu">
               <div class="custom-file">
                 <input type="file" class="custom-file-input" id="inputGroupFile01" @change="onFileChange($event, key)">
-                <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                <label class="custom-file-label" for="inputGroupFile01">{{ uploadImageString }}</label>
               </div>
             </div>
             <hr>
@@ -296,6 +296,7 @@ export default {
       statusOrder: 0,
       
       content: '',
+      uploadImageString:'',
       
       bulan: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
       list: [],
@@ -543,6 +544,9 @@ export default {
     },
     onFileChange(e, key) {
       this.sectionValue[key].image = e.target.files[0];
+      if(e.target.files[0]) {
+        this.uploadImageString = e.target.files[0].name
+      }
     },
     async create() {
       const formData = new FormData();
@@ -598,6 +602,8 @@ export default {
       } else {
         this.month = item
         this.tableOrder = this.listOrder[this.year][item] || []
+        this.tableOrder = JSON.parse(JSON.stringify(this.tableOrder))
+
         if(this.tableOrder.length > 0) {
           this.tableOrder = this.tableOrder.map(item => {
             item.action = ''
@@ -619,9 +625,9 @@ export default {
     },
     async getEventsOrder() {
       try {
-        const res = await axios.get(`${this.url}/order/${this.year}`)
+        const res = await axios.get(`${this.url}/order/${this.year}?ts=${Date.now()}`)
         if(res && res.data) {
-          this.listOrder = res.data.message
+          this.listOrder = {...res.data.message}
         }
       } catch (err) {
         this.$q.notify({

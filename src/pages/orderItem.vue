@@ -21,7 +21,7 @@
                             </div>
                         </div>
                         <div style="margin-bottom: 15px;">
-                        <q-table :title="`\u00A0 Mix`" :data="mixFlavor" :columns="columnFlavor" row-key="id"  dense
+                        <q-table :title="`\u00A0 Menu`" :data="mixFlavor" :columns="columnFlavor" row-key="id"  dense
                             hide-pagination>
                             <template v-slot:body-cell-pcs="props">
                                 <q-td :props="props">

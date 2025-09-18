@@ -246,10 +246,7 @@
               </h2>
             </div>
             <p>
-              There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration
-              in some form, by injected humour, or randomised words which don't look even slightly believable. If you
-              are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in
-              the middle of text. All
+             {{ list.section_4[list.section_4.length-1].desc }}
             </p>
           </div>
         </div>
