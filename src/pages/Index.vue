@@ -242,11 +242,11 @@
           <div class="detail-box">
             <div class="heading_container">
               <h2>
-                We Are Oyatsu
+                {{ section4desc.title }}
               </h2>
             </div>
             <p>
-             {{ list.section_4[0].desc }}
+             {{ section4desc.desc }}
             </p>
           </div>
         </div>
@@ -274,20 +274,25 @@ export default {
   data() {
     return {
       list: [],
-      year: 2025,
-      url: process.env.VUE_APP_API_URL
+      year: 0,
+      url: process.env.VUE_APP_API_URL,
+      section4desc: ''
     }
   },
   methods: {
     async getEvents () {
+      const date = new Date()
+      this.year = date.getFullYear()
       try {
         const res = await axios.get(`${this.url}/component/${this.year}`);
         const date = new Date()
         const month = date.getMonth()
         const year = date.getFullYear()
         this.list = res.data.message[year][month] ? res.data.message[year][month] : res.data.message[year][month-1]
+        this.list = JSON.parse((JSON.stringify(this.list)))
+        this.section4desc = this.list.section_4[this.list.section_4.length - 1]
       } catch (err) {
-        console.error(err, 'xxx')
+        this.$q.notify({type: 'negative', message: err})
       }
     }
   },
