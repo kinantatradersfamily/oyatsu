@@ -229,7 +229,7 @@
 
   <!-- about section -->
 
-  <section class="about_section layout_padding" style="padding: 0px">
+  <section class="about_section layout_padding" style="padding: 0px; background-color: #415E72;">
     <div class="container  ">
       <div class="row">
         <div class="col-md-6 ">
