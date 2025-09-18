@@ -347,7 +347,6 @@ export default {
         },
     },
     mounted() {
-        console.log(this.main_price)
         const date = new Date()
         this.year = date.getFullYear()
         this.month = date.getMonth()
