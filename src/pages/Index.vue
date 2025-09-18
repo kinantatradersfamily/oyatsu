@@ -246,7 +246,7 @@
               </h2>
             </div>
             <p>
-             {{ list.section_4[list.section_4.length-1].desc }}
+             {{ list.section_4[0].desc }}
             </p>
           </div>
         </div>
