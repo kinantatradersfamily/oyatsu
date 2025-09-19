@@ -326,17 +326,30 @@ export default {
                     this.flavorObj = {}
                     this.fileLabel = ''
                     this.contentFlavor = 0
+                    
                     this.mixFlavor = [
-                        {
-                            flavor: 'Vanilla', pcs: 0
-                        },
-                        {
-                            flavor: 'Chocolate', pcs: 0
-                        },
-                        {
-                            flavor: 'Cheese', pcs: 0
-                        },
-                    ]
+                {
+                    flavor: 'Creamcheese', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Cookies and Cream', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Chocolate', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Lemon Curd', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Lemongrass Yoghurt', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Vanilla', pcs: 0, action: ''
+                },
+                 {
+                    flavor: 'Kolak', pcs: 0, action: ''
+                },
+            ]
                 } else {
                     this.$q.loading.hide()
                 }

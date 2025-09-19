@@ -68,11 +68,6 @@
         </q-img>
       </q-drawer>
       <q-page-container v-if="content == 'grafik'">
-        <div class="filter-grafik" style="padding: 20px;">
-          <a href="javascript:void(0)" class="btn btn-primary" v-for="data in 12" :key="data" style="margin-right: 10px;" @click="dataFilterChart(data)">
-             {{ bulan[data-1] }}
-           </a>
-        </div>
         <div class="q-pa-md">
           <canvas ref="chartCanvas"></canvas>
         </div>
@@ -315,14 +310,24 @@ export default {
       if(data == 'all') {
         this.grafikOrderArr.data = []
 
-        for(const[key, value] of Object.entries(this.listOrder)) {
-          for(const[key1, value1] of Object.entries(value)) {
-            value1.forEach(item => {
-              const data = JSON.parse(item.flavor).map(item => parseInt(item.pack)).reduce((a,b) => a + b)
-              this.grafikOrderArr.data.push(data)
-            })
-          }
-        }
+        this.bulan.forEach((item, index) => {
+            if(this.listOrder[this.year][index]) {
+              const average = this.listOrder[this.year][index]
+              this.grafikOrderArr.data.push(average.length)
+            } else {
+              this.grafikOrderArr.data.push(0)
+            }
+        })
+
+
+        // for(const[key, value] of Object.entries(this.listOrder)) {
+        //   for(const[key1, value1] of Object.entries(value)) {
+        //     value1.forEach(item => {
+        //       const data = JSON.parse(item.flavor).map(item => parseInt(item.pack)).reduce((a,b) => a + b)
+        //       this.grafikOrderArr.data.push(data)
+        //     })
+        //   }
+        // }
         this.declareChart()
         return
       }
@@ -349,9 +354,9 @@ export default {
 
         const ctx = this.$refs.chartCanvas.getContext("2d");
         this.myChart = new Chart(ctx, {
-          type: "line", 
+          type: "bar", 
           data: {
-            labels: this.grafikOrderArr.label,
+            labels: this.bulan,
             datasets: [
               {
                 label: "Order'an",
@@ -368,16 +373,10 @@ export default {
                 grid: {
                   display: false 
                 },
-                ticks: {
-                  maxTicksLimit: 10,
-                  callback: (value, index, ticks) => {
-                    return moment(this.grafikOrderArr.label[index] * 1000).format('LL');
-                  },
-                }
               },
               y: {
                 ticks: {
-                  maxTicksLimit: 10
+                  maxTicksLimit: 5
                 },
                 grid: {
                   display: false
@@ -389,7 +388,7 @@ export default {
                 callbacks: {
                   title: (tooltipItems) => {
                     const data = tooltipItems[0]
-                    return moment(data.label * 1000).format('YYYY-MM-DD HH:mm:ss');
+                    return data.label
                   },
                   label: (tooltipItem) => {
                     return `Jumlah: ${tooltipItem.parsed.y}`;
